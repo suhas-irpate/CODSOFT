@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizMaster - Create & Take Quizzes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #f94144;
+            --gray: #6c757d;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7ff;
+            padding-top: 80px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-outline:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Main Content */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .active {
+            display: block;
+        }
+
+        /* Home Page */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: var(--dark);
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .featured-quizzes {
+            padding: 3rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .quiz-image {
+            height: 160px;
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .quiz-content {
+            padding: 1.5rem;
+        }
+
+        .quiz-content h3 {
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        /* Forms */
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .option-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-row input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .option-row input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .add-option {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .add-option:hover {
+            text-decoration: underline;
+        }
+
+        /* Quiz Taking */
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .option-item:hover {
+            background: #f8f9fa;
+        }
+
+        .option-item.selected {
+            background: rgba(67, 97, 238, 0.1);
+            border-color: var(--primary);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        /* Results Page */
+        .results-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .score-text {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .review-list {
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        .review-item {
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .correct {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .incorrect {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .auth-toggle a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        /* Answer Feedback Popup */
+        .feedback-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            text-align: center;
+            display: none;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .feedback-popup.correct {
+            border-top: 5px solid var(--success);
+        }
+
+        .feedback-popup.incorrect {
+            border-top: 5px solid var(--danger);
+        }
+
+        .feedback-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .correct .feedback-icon {
+            color: var(--success);
+        }
+
+        .incorrect .feedback-icon {
+            color: var(--danger);
+        }
+
+        .feedback-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-explanation {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .quiz-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-3 {
+            margin-top: 1.5rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>QuizMaster</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="showPage('home')">Home</a></li>
+                    <li><a href="#" onclick="showPage('browse')">Browse Quizzes</a></li>
+                    <li><a href="#" onclick="showPage('create')">Create Quiz</a></li>
+                    <li><a href="#" onclick="showPage('login')">Login</a></li>
+                </ul>
+                <a href="#" class="btn" onclick="showPage('signup')">Sign Up</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <div class="hero">
+                <h1>Create & Take Engaging Quizzes</h1>
+                <p>QuizMaster is the perfect platform to create custom quizzes, test your knowledge, and challenge your friends.</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn" onclick="showPage('create')">Create a Quiz</a>
+                    <a href="#" class="btn btn-outline" onclick="showPage('browse')">Take a Quiz</a>
+                </div>
+            </div>
+
+            <div class="featured-quizzes">
+                <div class="section-title">
+                    <h2>Featured Quizzes</h2>
+                    <p>Check out these popular quizzes created by our community</p>
+                </div>
+                <div class="quiz-grid">
+                    <div class="quiz-card">
+                        <div class="quiz-image">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <div class="quiz-content">
+                            <h3>World Capitals</h3>
+                            <p>Test your knowledge of world capitals with this challenging quiz.</p>
+                            <div class="quiz-meta">
+                                <span>10 questions</span>
+                                <span>★ ★ ★ ★ ☆</span>
+                            </div>
+                            <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(1)">Take Quiz</a>
+                        </div>
+                    </div>
+                    <div class="quiz-card">
+                        <div class="quiz-image">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="quiz-content">
+                            <h3>Science Trivia</h3>
+                            <p>How well do you know basic science concepts? Find out now!</p>
+                            <div class="quiz-meta">
+                                <span>15 questions</span>
+                                <span>★ ★ ★ ★ ★</span>
+                            </div>
+                            <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(2)">Take Quiz</a>
+                        </div>
+                    </div>
+                    <div class="quiz-card">
+                        <div class="quiz-image">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="quiz-content">
+                            <h3>Movie Quotes</h3>
+                            <p>Can you identify these famous movie quotes? Challenge yourself!</p>
+                            <div class="quiz-meta">
+                                <span>12 questions</span>
+                                <span>★ ★ ★ ☆ ☆</span>
+                            </div>
+                            <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(3)">Take Quiz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Creation Page -->
+        <div id="create" class="page">
+            <div class="form-container">
+                <h2 class="form-title">Create a New Quiz</h2>
+                <form id="quiz-form">
+                    <div class="form-group">
+                        <label for="quiz-title">Quiz Title</label>
+                        <input type="text" id="quiz-title" class="form-control" placeholder="Enter quiz title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quiz-description">Quiz Description</label>
+                        <textarea id="quiz-description" class="form-control" rows="3" placeholder="Enter quiz description"></textarea>
+                    </div>
+                    
+                    <div id="questions-container">
+                        <div class="question-form">
+                            <h3>Question 1</h3>
+                            <div class="form-group">
+                                <label>Question Text</label>
+                                <input type="text" class="form-control question-text" placeholder="Enter your question" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Options</label>
+                                <div class="option-row">
+                                    <input type="radio" name="correct-answer1" required>
+                                    <input type="text" class="form-control option-text" placeholder="Option 1" required>
+                                </div>
+                                <div class="option-row">
+                                    <input type="radio" name="correct-answer1" required>
+                                    <input type="text" class="form-control option-text" placeholder="Option 2" required>
+                                </div>
+                                <div class="option-row">
+                                    <input type="radio" name="correct-answer1" required>
+                                    <input type="text" class="form-control option-text" placeholder="Option 3" required>
+                                </div>
+                                <div class="option-row">
+                                    <input type="radio" name="correct-answer1" required>
+                                    <input type="text" class="form-control option-text" placeholder="Option 4" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-outline" id="add-question">Add Another Question</button>
+                    <button type="submit" class="btn">Create Quiz</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quiz Taking Page -->
+        <div id="take-quiz" class="page">
+            <div class="quiz-header">
+                <h2 id="quiz-title-taking">World Capitals</h2>
+                <p id="quiz-progress">Question 1 of 10</p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress" id="quiz-progress-bar" style="width: 10%;"></div>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-text" id="current-question">What is the capital of France?</div>
+                <ul class="options-list" id="options-list">
+                    <!-- Options will be populated by JavaScript -->
+                </ul>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn btn-outline" id="prev-btn" onclick="previousQuestion()" disabled>Previous</button>
+                <button class="btn" id="next-btn" onclick="checkAnswer()">Next Question</button>
+                <button class="btn hidden" id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
+            </div>
+        </div>
+
+        <!-- Results Page -->
+        <div id="results" class="page">
+            <div class="results-container">
+                <h2>Quiz Completed!</h2>
+                <div class="score-display" id="final-score">8/10</div>
+                <div class="score-text" id="score-message">Great job! You know your world capitals well.</div>
+                <a href="#" class="btn" onclick="showPage('browse')">Take Another Quiz</a>
+                
+                <div class="review-list" id="review-list">
+                    <!-- Review items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Browse Quizzes Page -->
+        <div id="browse" class="page">
+            <div class="section-title">
+                <h2>Browse Quizzes</h2>
+                <p>Select a quiz to test your knowledge</p>
+            </div>
+            
+            <div class="quiz-grid">
+                <div class="quiz-card">
+                    <div class="quiz-image">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <div class="quiz-content">
+                        <h3>World Capitals</h3>
+                        <p>Test your knowledge of world capitals with this challenging quiz.</p>
+                        <div class="quiz-meta">
+                            <span>10 questions</span>
+                            <span>★ ★ ★ ★ ☆</span>
+                        </div>
+                        <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(1)">Take Quiz</a>
+                    </div>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-image">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="quiz-content">
+                        <h3>Science Trivia</h3>
+                        <p>How well do you know basic science concepts? Find out now!</p>
+                        <div class="quiz-meta">
+                            <span>15 questions</span>
+                            <span>★ ★ ★ ★ ★</span>
+                        </div>
+                        <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(2)">Take Quiz</a>
+                    </div>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-image">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <div class="quiz-content">
+                        <h3>Movie Quotes</h3>
+                        <p>Can you identify these famous movie quotes? Challenge yourself!</p>
+                        <div class="quiz-meta">
+                            <span>12 questions</span>
+                            <span>★ ★ ★ ☆ ☆</span>
+                        </div>
+                        <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(3)">Take Quiz</a>
+                    </div>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-image">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="quiz-content">
+                        <h3>Music Legends</h3>
+                        <p>How well do you know the greatest musicians of all time?</p>
+                        <div class="quiz-meta">
+                            <span>8 questions</span>
+                            <span>★ ★ ★ ★ ☆</span>
+                        </div>
+                        <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(4)">Take Quiz</a>
+                    </div>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-image">
+                        <i class="fas fa-basketball-ball"></i>
+                    </div>
+                    <div class="quiz-content">
+                        <h3>Sports Trivia</h3>
+                        <p>Test your knowledge of sports history and records.</p>
+                        <div class="quiz-meta">
+                            <span>20 questions</span>
+                            <span>★ ★ ★ ★ ☆</span>
+                        </div>
+                        <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(5)">Take Quiz</a>
+                    </div>
+                </div>
+                <div class="quiz-card">
+                    <div class="quiz-image">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="quiz-content">
+                        <h3>Food & Cuisine</h3>
+                        <p>How well do you know world cuisine? Take this delicious quiz!</p>
+                        <div class="quiz-meta">
+                            <span>10 questions</span>
+                            <span>★ ★ ★ ☆ ☆</span>
+                        </div>
+                        <a href="#" class="btn btn-outline mt-3" onclick="startQuiz(6)">Take Quiz</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login" class="page">
+            <div class="auth-container">
+                <h2 class="form-title">Login to Your Account</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+                <div class="auth-toggle">
+                    <p>Don't have an account? <a href="#" onclick="showPage('signup')">Sign up here</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Page -->
+        <div id="signup" class="page">
+            <div class="auth-container">
+                <h2 class="form-title">Create an Account</h2>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" class="form-control" placeholder="Create a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn">Sign Up</button>
+                </form>
+                <div class="auth-toggle">
+                    <p>Already have an account? <a href="#" onclick="showPage('login')">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Answer Feedback Popup -->
+    <div class="overlay" id="feedback-overlay"></div>
+    <div class="feedback-popup" id="feedback-popup">
+        <div class="feedback-icon" id="feedback-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="feedback-text" id="feedback-text">Correct!</div>
+        <div class="feedback-explanation" id="feedback-explanation">Paris is the capital of France.</div>
+        <button class="btn" id="feedback-continue">Continue</button>
+    </div>
+
+    <script>
+        // Quiz data with different questions and options
+        const quizData = {
+            title: "World Capitals Quiz",
+            questions: [
+                {
+                    question: "What is the capital of France?",
+                    options: ["London", "Berlin", "Paris", "Madrid"],
+                    correctAnswer: "Paris",
+                    explanation: "Paris is the capital and most populous city of France."
+                },
+                {
+                    question: "What is the capital of Japan?",
+                    options: ["Seoul", "Beijing", "Tokyo", "Bangkok"],
+                    correctAnswer: "Tokyo",
+                    explanation: "Tokyo is the capital and most populous prefecture of Japan."
+                },
+                {
+                    question: "What is the capital of Australia?",
+                    options: ["Sydney", "Melbourne", "Canberra", "Perth"],
+                    correctAnswer: "Canberra",
+                    explanation: "Canberra is the capital city of Australia."
+                },
+                {
+                    question: "What is the capital of Brazil?",
+                    options: ["Rio de Janeiro", "Brasília", "São Paulo", "Buenos Aires"],
+                    correctAnswer: "Brasília",
+                    explanation: "Brasília is the federal capital of Brazil."
+                },
+                {
+                    question: "What is the capital of Egypt?",
+                    options: ["Cairo", "Alexandria", "Luxor", "Giza"],
+                    correctAnswer: "Cairo",
+                    explanation: "Cairo is the capital and largest city of Egypt."
+                },
+                {
+                    question: "What is the capital of Canada?",
+                    options: ["Toronto", "Vancouver", "Ottawa", "Montreal"],
+                    correctAnswer: "Ottawa",
+                    explanation: "Ottawa is the capital city of Canada."
+                },
+                {
+                    question: "What is the capital of South Africa?",
+                    options: ["Cape Town", "Pretoria", "Johannesburg", "Durban"],
+                    correctAnswer: "Pretoria",
+                    explanation: "Pretoria is the administrative capital of South Africa."
+                },
+                {
+                    question: "What is the capital of India?",
+                    options: ["Mumbai", "New Delhi", "Kolkata", "Bangalore"],
+                    correctAnswer: "New Delhi",
+                    explanation: "New Delhi is the capital of India."
+                },
+                {
+                    question: "What is the capital of Russia?",
+                    options: ["St. Petersburg", "Moscow", "Novosibirsk", "Kazan"],
+                    correctAnswer: "Moscow",
+                    explanation: "Moscow is the capital and largest city of Russia."
+                },
+                {
+                    question: "What is the capital of Argentina?",
+                    options: ["Buenos Aires", "Santiago", "Lima", "Montevideo"],
+                    correctAnswer: "Buenos Aires",
+                    explanation: "Buenos Aires is the capital and largest city of Argentina."
+                }
+            ]
+        };
+
+        // Page Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Quiz Creation
+        let questionCount = 1;
+        
+        document.getElementById('add-question').addEventListener('click', function() {
+            questionCount++;
+            const questionsContainer = document.getElementById('questions-container');
+            const newQuestion = document.createElement('div');
+            newQuestion.className = 'question-form';
+            newQuestion.innerHTML = `
+                <h3>Question ${questionCount}</h3>
+                <div class="form-group">
+                    <label>Question Text</label>
+                    <input type="text" class="form-control question-text" placeholder="Enter your question" required>
+                </div>
+                <div class="form-group">
+                    <label>Options</label>
+                    <div class="option-row">
+                        <input type="radio" name="correct-answer${questionCount}" required>
+                        <input type="text" class="form-control option-text" placeholder="Option 1" required>
+                    </div>
+                    <div class="option-row">
+                        <input type="radio" name="correct-answer${questionCount}" required>
+                        <input type="text" class="form-control option-text" placeholder="Option 2" required>
+                    </div>
+                    <div class="option-row">
+                        <input type="radio" name="correct-answer${questionCount}" required>
+                        <input type="text" class="form-control option-text" placeholder="Option 3" required>
+                    </div>
+                    <div class="option-row">
+                        <input type="radio" name="correct-answer${questionCount}" required>
+                        <input type="text" class="form-control option-text" placeholder="Option 4" required>
+                    </div>
+                </div>
+            `;
+            questionsContainer.appendChild(newQuestion);
+        });
+
+        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Quiz created successfully!');
+            showPage('home');
+        });
+
+        // Quiz Taking
+        let currentQuestion = 0;
+        const totalQuestions = quizData.questions.length;
+        const userAnswers = [];
+
+        function startQuiz(quizId) {
+            currentQuestion = 0;
+            userAnswers.length = 0;
+            loadQuestion();
+            updateProgress();
+            showPage('take-quiz');
+        }
+
+        function loadQuestion() {
+            const questionData = quizData.questions[currentQuestion];
+            document.getElementById('current-question').textContent = questionData.question;
+            
+            const optionsList = document.getElementById('options-list');
+            optionsList.innerHTML = '';
+            
+            questionData.options.forEach(option => {
+                const li = document.createElement('li');
+                li.className = 'option-item';
+                li.textContent = option;
+                li.onclick = function() { selectOption(this); };
+                optionsList.appendChild(li);
+            });
+        }
+
+        function selectOption(element) {
+            document.querySelectorAll('.option-item').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        function checkAnswer() {
+            const selectedOption = document.querySelector('.option-item.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            const userAnswer = selectedOption.textContent;
+            const isCorrect = userAnswer === quizData.questions[currentQuestion].correctAnswer;
+            
+            // Show feedback popup
+            showFeedback(isCorrect, userAnswer);
+        }
+
+        function showFeedback(isCorrect, userAnswer) {
+            const popup = document.getElementById('feedback-popup');
+            const overlay = document.getElementById('feedback-overlay');
+            const icon = document.getElementById('feedback-icon');
+            const text = document.getElementById('feedback-text');
+            const explanation = document.getElementById('feedback-explanation');
+            const continueBtn = document.getElementById('feedback-continue');
+            
+            // Set popup content based on correctness
+            if (isCorrect) {
+                popup.className = 'feedback-popup correct';
+                icon.innerHTML = '<i class="fas fa-check"></i>';
+                text.textContent = 'Correct!';
+                text.style.color = 'var(--success)';
+            } else {
+                popup.className = 'feedback-popup incorrect';
+                icon.innerHTML = '<i class="fas fa-times"></i>';
+                text.textContent = 'Incorrect!';
+                text.style.color = 'var(--danger)';
+            }
+            
+            explanation.textContent = quizData.questions[currentQuestion].explanation;
+            
+            // Show popup and overlay
+            popup.style.display = 'block';
+            popup.style.animation = 'bounceIn 0.5s forwards';
+            overlay.style.display = 'block';
+            
+            // Set continue button action
+            continueBtn.onclick = function() {
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+                
+                // Store user answer
+                userAnswers[currentQuestion] = {
+                    userAnswer: userAnswer,
+                    isCorrect: isCorrect
+                };
+                
+                nextQuestion();
+            };
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion >= totalQuestions) {
+                document.getElementById('next-btn').classList.add('hidden');
+                document.getElementById('submit-quiz').classList.remove('hidden');
+            } else {
+                loadQuestion();
+                updateProgress();
+            }
+            
+            document.getElementById('prev-btn').disabled = false;
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+                updateProgress();
+                
+                if (currentQuestion === 0) {
+                    document.getElementById('prev-btn').disabled = true;
+                }
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('quiz-progress').textContent = `Question ${currentQuestion + 1} of ${totalQuestions}`;
+            const progressPercent = ((currentQuestion + 1) / totalQuestions) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${progressPercent}%`;
+        }
+
+        function submitQuiz() {
+            // Calculate score
+            let score = 0;
+            for (let i = 0; i < totalQuestions; i++) {
+                if (userAnswers[i] && userAnswers[i].isCorrect) {
+                    score++;
+                }
+            }
+            
+            // Update results page
+            document.getElementById('final-score').textContent = `${score}/${totalQuestions}`;
+            
+            // Set score message based on performance
+            let scoreMessage = '';
+            if (score === totalQuestions) {
+                scoreMessage = 'Perfect score! You\'re a geography expert!';
+            } else if (score >= totalQuestions * 0.7) {
+                scoreMessage = 'Great job! You know your world capitals well.';
+            } else if (score >= totalQuestions * 0.5) {
+                scoreMessage = 'Good effort! Keep learning and try again.';
+            } else {
+                scoreMessage = 'Keep studying world capitals and try again!';
+            }
+            document.getElementById('score-message').textContent = scoreMessage;
+            
+            // Generate review items
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '<h3>Review Your Answers</h3>';
+            
+            for (let i = 0; i < totalQuestions; i++) {
+                const questionData = quizData.questions[i];
+                const userAnswer = userAnswers[i] ? userAnswers[i].userAnswer : 'Not answered';
+                const isCorrect = userAnswers[i] ? userAnswers[i].isCorrect : false;
+                
+                const reviewItem = document.createElement('div');
+                reviewItem.className = 'review-item';
+                reviewItem.innerHTML = `
+                    <p><strong>Question ${i + 1}:</strong> ${questionData.question}</p>
+                    <p class="${isCorrect ? 'correct' : 'incorrect'}">Your answer: ${userAnswer} ${isCorrect ? '✓' : '✗'}</p>
+                    ${!isCorrect ? `<p class="correct">Correct answer: ${questionData.correctAnswer}</p>` : ''}
+                    <p><em>${questionData.explanation}</em></p>
+                `;
+                
+                reviewList.appendChild(reviewItem);
+            }
+            
+            // Show results page
+            showPage('results');
+        }
+
+        // Authentication
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Login successful!');
+            showPage('home');
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            if (password !== confirm) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            alert('Account created successfully!');
+            showPage('home');
+        });
+    </script>
+</body>
+</html>
